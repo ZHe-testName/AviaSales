@@ -10,15 +10,17 @@ const formSearch = document.querySelector('.form-search'),
 
 
 //массив возможных городов
-const city = ["Киев", "Москва", "Минск", "Санкт-Петербург", "Челябинск",
-"Керч", "Волгоград", "Самара", "Днепр", "Екатеринбург", "Одесса",
-"Ухань", "Тбилиси", "Кайсери", "Вроцлав", "Ростов-на-Дону"];
+let city = [];
 
 //const cityesApi = 'http://api.travelpayouts.com/data/ru/cities.json';
 
 const cityesApi = 'data base/cityes.json';
 
 const proxy = 'https://cors-anywhere.herokuapp.com/';
+
+const API_KEY = 'fe97c4abc71297b7ea093a47d516bdfb';
+
+const CALENDAR = 'http://min-prices.aviasales.ru/calendar_preload';
 
 //функция для илюстрации выпадающего списка городов
 const showCity = (input, list) => {
@@ -33,15 +35,15 @@ const showCity = (input, list) => {
     //создаем массив из городов в массиве city которые включают в
     //себя введеный в инпут текст
     const filterCity = city.filter((item) => {
-        const fixItem = item.toLowerCase();
-        return fixItem.includes(input.value.toLowerCase());
+            const fixItem = item.name.toLowerCase();
+            return fixItem.includes(input.value.toLowerCase());
     });
     
     //создаем елемент выпадающего списка для каждого елемента массива filterCity
     filterCity.forEach((item) => {
         const li = document.createElement('li');
         li.classList.add('dropdowm__city');
-        li.textContent = item;
+        li.textContent = item.name;
         list.append(li);
     });
 };
@@ -55,6 +57,8 @@ const hendlerCity = (event, input, list) => {
     };
 };
 
+//функция обращения к базе данных городов
+//на сервере
 const getData = (url, callback) => {
     //создаем обект запроса
     const request = new XMLHttpRequest();
@@ -62,11 +66,13 @@ const getData = (url, callback) => {
     request.open('GET', url);
 
     //слушатель когда прийдет ответ с сервера
+    //4-ка означает что ответ пришел
     request.addEventListener('readystatechange', () => {
         if(request.readyState !== 4){
             return;
         }
 
+        //статус 200 означает что все хорошо
         if(request.status === 200){
             callback(request.response)
         }else{
@@ -100,8 +106,17 @@ dropdownCitiesTo.addEventListener('click', (event) => {
         hendlerCity(event, inputCitiesTo, dropdownCitiesTo);
 });
 
-//getData('https://jsonplaceholder.typicode.com/todos/1');
+
 
 getData(cityesApi, (data) => {
-    console.log(data);
+    city = JSON.parse(data).filter(item => item.name);
+
+    /*тоже самое что
+      city = JSON.parse(data).filter((item) => {
+          if(item.name === true){
+              return true;
+          }
+          );
+    
+    */
 })
