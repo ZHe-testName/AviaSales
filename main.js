@@ -14,6 +14,12 @@ const city = ["Киев", "Москва", "Минск", "Санкт-Петерб
 "Керч", "Волгоград", "Самара", "Днепр", "Екатеринбург", "Одесса",
 "Ухань", "Тбилиси", "Кайсери", "Вроцлав", "Ростов-на-Дону"];
 
+//const cityesApi = 'http://api.travelpayouts.com/data/ru/cities.json';
+
+const cityesApi = 'data base/cityes.json';
+
+const proxy = 'https://cors-anywhere.herokuapp.com/';
+
 //функция для илюстрации выпадающего списка городов
 const showCity = (input, list) => {
     //каждый раз очищаем выпадающий список
@@ -38,7 +44,40 @@ const showCity = (input, list) => {
         li.textContent = item;
         list.append(li);
     });
+};
+
+//функция для обработки клика по городу из списка
+const hendlerCity = (event, input, list) => {
+    const target = event.target;
+    if(target.tagName.toLowerCase() === 'li'){
+        input.value = target.textContent;
+        list.textContent = '';
+    };
+};
+
+const getData = (url, callback) => {
+    //создаем обект запроса
+    const request = new XMLHttpRequest();
+
+    request.open('GET', url);
+
+    //слушатель когда прийдет ответ с сервера
+    request.addEventListener('readystatechange', () => {
+        if(request.readyState !== 4){
+            return;
+        }
+
+        if(request.status === 200){
+            callback(request.response)
+        }else{
+            console.error(request.status)
+        }
+    });
+
+    request.send();
 }
+
+
 
 //функция "живого поиска" по городам "из"
 inputCitiesFrom.addEventListener('input', () => {
@@ -48,11 +87,7 @@ inputCitiesFrom.addEventListener('input', () => {
 
 //функция обработки на клик ))по елементу списка "из"
 dropdownCitiesFrom.addEventListener('click', (event) => {
-    const target = event.target;
-    if(target.tagName.toLowerCase() === 'li'){
-        inputCitiesFrom.value = target.textContent;
-        dropdownCitiesFrom.textContent = '';
-    };
+    hendlerCity(event, inputCitiesFrom, dropdownCitiesFrom);
 });
 
 //функция "живого поиска" по городам "в"
@@ -62,9 +97,11 @@ inputCitiesTo.addEventListener('input', () => {
 
 //функция обработки на клик ))по елементу списка "в"
 dropdownCitiesTo.addEventListener('click', (event) => {
-    const target = event.target;
-    if(target.tagName.toLowerCase() === 'li'){
-        inputCitiesTo.value = target.textContent;
-        dropdownCitiesTo.textContent = '';
-    };
+        hendlerCity(event, inputCitiesTo, dropdownCitiesTo);
 });
+
+//getData('https://jsonplaceholder.typicode.com/todos/1');
+
+getData(cityesApi, (data) => {
+    console.log(data);
+})
