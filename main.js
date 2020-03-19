@@ -20,7 +20,7 @@ const proxy = 'https://cors-anywhere.herokuapp.com/';
 
 const API_KEY = 'fe97c4abc71297b7ea093a47d516bdfb';
 
-const CALENDAR = 'http://min-prices.aviasales.ru/calendar_preload';
+const CALENDAR = 'http://api.travelpayouts.com/v2/prices/latest?';
 
 //функция для илюстрации выпадающего списка городов
 const showCity = (input, list) => {
@@ -81,7 +81,29 @@ const getData = (url, callback) => {
     });
 
     request.send();
-}
+};
+
+//функция обращения к API авиакомпании на наличие билетов
+const getPrice = (url, callback) => {
+    const requestToPrice = new XMLHttpRequest();
+
+    requestToPrice.open('GET', url);
+
+    requestToPrice.addEventListener('readystatechange', () => {
+        if(requestToPrice.readyState !== 4){
+            return;
+        };
+
+        if(requestToPrice.status === 200){
+            callback(requestToPrice.response);
+        }else{
+            console.error(requestToPrice.status);
+        };
+    });
+
+    requestToPrice.send();
+
+};
 
 
 
@@ -107,10 +129,10 @@ dropdownCitiesTo.addEventListener('click', (event) => {
 });
 
 
-
+//получение обекта городов
 getData(cityesApi, (data) => {
     city = JSON.parse(data).filter(item => item.name);
-
+    
     /*тоже самое что
       city = JSON.parse(data).filter((item) => {
           if(item.name === true){
@@ -119,4 +141,22 @@ getData(cityesApi, (data) => {
           );
     
     */
-})
+});
+
+//функция поиска билетов
+getPrice(`${CALENDAR}
+currency=rub&period_type=month&beginning_of_period=2020-06-01&origin=SVX&destination=KGD&page=1&limit=30&show_to_affiliates=true&sorting=price&token=
+${API_KEY}`, (data) => {
+    let price = data;
+    console.log(price);
+});
+
+//функция дла выдачи IATA кода с массива городов
+/*
+const giveMeCode = (arr, nameOfTown) => {
+    let town = arr.filter(item => {
+        return item.name === nameOfTown ? true : false;
+    });
+    return town[0].code;
+}
+*/
