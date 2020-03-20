@@ -14,13 +14,13 @@ let city = [];
 
 //const cityesApi = 'http://api.travelpayouts.com/data/ru/cities.json';
 
-const cityesApi = 'data base/cityes.json';
+const CITIES_API = 'data base/cityes.json';
 
-const proxy = 'https://cors-anywhere.herokuapp.com/';
+const PROXY = 'https://cors-anywhere.herokuapp.com/';
 
 const API_KEY = 'fe97c4abc71297b7ea093a47d516bdfb';
 
-const CALENDAR = 'http://api.travelpayouts.com/v2/prices/latest?';
+const CALENDAR = 'http://min-prices.aviasales.ru/calendar_preload';
 
 //функция для илюстрации выпадающего списка городов
 const showCity = (input, list) => {
@@ -105,6 +105,24 @@ const getPrice = (url, callback) => {
 
 };
 
+const renderCheapDay = (cheapTick) => {
+    console.log(cheapTick);
+};
+
+const renderCheapYear = (cheapTickS) => {
+    console.log(cheapTickS);
+};
+
+//фнкция для определения списка подходящих билетов и 
+//билета на нашу дату
+const renderCheap = (data, when) => {
+    const cheapTicket = JSON.parse(data).best_prices;
+    const cheapTicketDay = cheapTicket.filter(item => item.depart_date === when);
+    
+    renderCheapDay(cheapTicketDay);
+    renderCheapYear(cheapTicket);
+};
+
 
 
 //функция "живого поиска" по городам "из"
@@ -128,11 +146,36 @@ dropdownCitiesTo.addEventListener('click', (event) => {
         hendlerCity(event, inputCitiesTo, dropdownCitiesTo);
 });
 
+//функция обработки отправки данных
+formSearch.addEventListener('submit', (event) => {
+    event.preventDefault();
+    
+    const formData = {
+        from: city.find(item => inputCitiesFrom.value === item.name).code,
+        to: city.find(item => inputCitiesTo.value === item.name).code,
+        when: inputDateDepart.value,
+    };
+
+    /*
+    const reqestData = '?depart_date=' + formData.when +
+    '&origin=' + formData.from +
+    '&destination=' + formData.to +
+    '&token=' + API_KEY;
+    */
+
+//или с помощю интерполяции
+    const reqestData = `?depart_date=${formData.when}&origin=${formData.from}&destination=${formData.to}&token=${API_KEY}`;
+
+    getData(CALENDAR + reqestData, (response) => {
+        renderCheap(response, formData.when);
+    });
+});
+
 
 //получение обекта городов
-getData(cityesApi, (data) => {
+getData(CITIES_API, (data) => {
     city = JSON.parse(data).filter(item => item.name);
-    
+    console.log(city);
     /*тоже самое что
       city = JSON.parse(data).filter((item) => {
           if(item.name === true){
@@ -144,14 +187,18 @@ getData(cityesApi, (data) => {
 });
 
 //функция поиска билетов
+/*
 getPrice(`${CALENDAR}
-currency=rub&period_type=month&beginning_of_period=2020-06-01&origin=SVX&destination=KGD&page=1&limit=30&show_to_affiliates=true&sorting=price&token=
+currency=rub&period_type=month&beginning_of_period=2020-06-01&
+origin=SVX&destination=KGD&page=1&limit=30&show_to_affiliates=true&sorting=price&token=
 ${API_KEY}`, (data) => {
-    let price = data;
-    console.log(price);
+    let price = JSON.parse(data);
+    let lowestPrice = price.data[0];
+    console.log(lowestPrice);
 });
+*/
 
-//функция дла выдачи IATA кода с массива городов
+//Собственная функция дла выдачи IATA кода с массива городов
 /*
 const giveMeCode = (arr, nameOfTown) => {
     let town = arr.filter(item => {
