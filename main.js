@@ -82,7 +82,7 @@ const hendlerCity = (event, input, list) => {
 
 //функция обращения к базе данных городов
 //на сервере
-const getData = (url, callback) => {
+const getData = (url, callback, reject = console.error) => {
     //создаем обект запроса
     const request = new XMLHttpRequest();
 
@@ -97,9 +97,9 @@ const getData = (url, callback) => {
 
         //статус 200 означает что все хорошо
         if(request.status === 200){
-            callback(request.response)
+            callback(request.response);
         }else{
-            console.error(request.status)
+            reject(request.status);
         }
     });
 
@@ -293,6 +293,8 @@ formSearch.addEventListener('submit', (event) => {
         const reqestData = `?depart_date=${formData.when}&origin=${formData.from.code}&destination=${formData.to.code}&token=${API_KEY}`;
         getData(CALENDAR + reqestData, (response) => {
             renderCheap(response, formData.when);
+        },(error) => {
+            alert('Нет такого направления!');
         });
     }else{
         alert('Введите кректное название города!');
