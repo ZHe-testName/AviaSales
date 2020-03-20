@@ -110,7 +110,9 @@ const renderCheapDay = (cheapTick) => {
 };
 
 const renderCheapYear = (cheapTickS) => {
-    console.log(cheapTickS);
+    //сортировка обектов массива по цене
+    const sortedTickS = cheapTickS.sort((a, b) => a.value - b.value);
+    console.log(sortedTickS);
 };
 
 //фнкция для определения списка подходящих билетов и 
