@@ -23,7 +23,7 @@ const API_KEY = 'fe97c4abc71297b7ea093a47d516bdfb';
 const CALENDAR = 'http://min-prices.aviasales.ru/calendar_preload';
 
 //функция для илюстрации выпадающего списка городов
-const showCity = (input, list) => {
+const showCity = (input, list, event) => {
     //каждый раз очищаем выпадающий список
     list.textContent = '';
 
@@ -32,11 +32,30 @@ const showCity = (input, list) => {
         return;
     };
     
-    //создаем массив из городов в массиве city которые включают в
-    //себя введеный в инпут текст
-    const filterCity = city.filter((item) => {
+    //создаем массив из городов в массиве city название которых начинается
+    //на введеное в инпут значение
+    const filterCity1 = city.filter((item) => {
             const fixItem = item.name.toLowerCase();
-            return fixItem.includes(input.value.toLowerCase());
+            //отрезаем часть названия равную длинне введенного в инпут значения
+            const trim = fixItem.slice(0, event.target.value.length);
+            //сравниваем со значением в инпут
+            if(trim === input.value){
+                return true;
+            };
+            //return fixItem.includes(input.value.toLowerCase());
+    });
+
+    //алгоритм сортировки названий городов в алфавитном порядке
+    const filterCity = filterCity1.sort((a, b) => {
+        //для оптимизации в i присвоено значение длинны инпута
+        for(let i = event.target.value.length; i < a.name.length; i++){
+            if(a.name[i] < b.name[i]){
+                return -1;
+            }if(a.name[i] > b.name[i]){
+                return 1;
+            };
+            
+        };
     });
     
     //создаем елемент выпадающего списка для каждого елемента массива filterCity
@@ -128,8 +147,8 @@ const renderCheap = (data, when) => {
 
 
 //функция "живого поиска" по городам "из"
-inputCitiesFrom.addEventListener('input', () => {
-    showCity(inputCitiesFrom, dropdownCitiesFrom);
+inputCitiesFrom.addEventListener('input', (event) => {
+    showCity(inputCitiesFrom, dropdownCitiesFrom, event);
 });
 
 
@@ -139,8 +158,8 @@ dropdownCitiesFrom.addEventListener('click', (event) => {
 });
 
 //функция "живого поиска" по городам "в"
-inputCitiesTo.addEventListener('input', () => {
-    showCity(inputCitiesTo, dropdownCitiesTo);
+inputCitiesTo.addEventListener('input', (event) => {
+    showCity(inputCitiesTo, dropdownCitiesTo, event);
 });
 
 //функция обработки на клик ))по елементу списка "в"
