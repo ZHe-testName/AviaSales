@@ -8,7 +8,11 @@ const formSearch = document.querySelector('.form-search'),
     dropdownCitiesTo = document.querySelector('.dropdown__cities-to'),
     inputDateDepart = document.querySelector('.input__date-depart'),
     chipestTicket = document.getElementById('cheapest-ticket'),
-    otherCheapTickets = document.getElementById('other-cheap-tickets');
+    otherCheapTickets = document.getElementById('other-cheap-tickets'),
+    modal = document.querySelector('.modal'),
+    modalClose = document.querySelector('.modal-close'),
+    overlayModal = document.querySelector('.overlay-modal'),
+    modalTitle = document.querySelector('.modal__title');
 
 
 //массив возможных городов
@@ -78,6 +82,19 @@ const hendlerCity = (event, input, list) => {
         input.value = target.textContent;
         list.textContent = '';
     };
+};
+
+//функция для открития модальных окон
+const modalOpenFunc = (str) => {
+    overlayModal.classList.add('active');
+    modal.classList.add('active');
+    modalTitle.innerHTML = str;
+};
+
+//функция для закрития модального окна
+const modalCloseFunc = () => {
+    modal.classList.remove('active');
+    overlayModal.classList.remove('active');
 };
 
 //функция обращения к базе данных городов
@@ -271,6 +288,20 @@ dropdownCitiesTo.addEventListener('click', (event) => {
         hendlerCity(event, inputCitiesTo, dropdownCitiesTo);
 });
 
+//функция обработки клика на крестик на закритие модальных окон
+modalClose.addEventListener('click', modalCloseFunc);
+
+//функция обработки клика на оверлей на закритие модальных окон
+overlayModal.addEventListener('click', modalCloseFunc);
+
+//функция на закритие модальных окон по нажатию на esc
+document.body.addEventListener('keyup', (event) => {
+    let key = event.keyCode;
+    if(key === 27){
+        modalCloseFunc();
+    }
+});
+
 //функция обработки отправки данных
 formSearch.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -294,10 +325,11 @@ formSearch.addEventListener('submit', (event) => {
         getData(CALENDAR + reqestData, (response) => {
             renderCheap(response, formData.when);
         },(error) => {
-            alert('Нет такого направления!');
+            modalOpenFunc('Такое направление отсутсвует.');
+            console.log('Ошибка :' + error);
         });
     }else{
-        alert('Введите кректное название города!');
+        modalOpenFunc('Введите кректное название города!');
     };  
 });
 
